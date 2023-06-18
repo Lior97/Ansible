@@ -1,39 +1,39 @@
 ---
 - name: install node and npm
-  hosts: 159.89.1.54
+  hosts: "{{host}}"
   tasks: 
     - name: Update apt repo and cache
       apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-    - name: Install node js and npm
+    - name: Install nodejs and npm
       apt: 
         pkg: 
           - nodejs
           - npm          
 
 - name: Create a new user
-  hosts: 159.89.1.54
+  hosts: "{{host}}"
   tasks:
     - name: Create linux user
       user:
-       name: lior
-       comment: Lior Admin
+       name: "{{user_name}}"
+       comment: "{{user_name}}" Admin
        group: admins
           
 - name: Deploy nodejs app
-  hosts: 159.89.1.54
+  hosts: "{{host}}"
   become: True
-  become_user: lior
+  become_user: "{{user_name}}"
   tasks: 
     - name: Unpack nodejs file
       unarchive: 
-        src: /home/lior/Downloads/Bootcamp/nodejsapp/nodejs-app-1.0.0.trz
-        des: /home/lior
+        src: "{{location}}"-{{version}}.trz
+        des: /home/{{user_name}}
     -name: Install dependencies
       npm:
-        path: /home/lior/package
+        path: /home/{{user_name}}/package
     - name: Start the app
       command: 
-        chdir: /home/lior/package/app
+        chdir: /home/{{user_name}}/package/app
         cmd: node server
        async: 1000
        poll: 0
