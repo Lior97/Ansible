@@ -33,10 +33,10 @@
     - name: Unpack nodejs file
       unarchive: 
         src: "{{location}}"-{{version}}.trz
-        des: /home/{{user_name}}
+        des: "{{user_home_dir}}"
     -name: Install dependencies
       npm:
-        path: /home/{{user_name}}/package
+        path: "{{user_home_dir}}"/package
     - name: Start the app
       command: 
         chdir: "{{user_home_dir}}"/package/app
