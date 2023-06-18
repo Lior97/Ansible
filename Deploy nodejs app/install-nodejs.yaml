@@ -1,5 +1,7 @@
 ---
 - name: install node and npm
+  vars_files:
+    - vars
   hosts: "{{host}}"
   tasks: 
     - name: Update apt repo and cache
@@ -11,6 +13,8 @@
           - npm          
 
 - name: Create a new user
+  vars_files:
+    - vars
   hosts: "{{host}}"
   tasks:
     - name: Create linux user
@@ -20,6 +24,8 @@
        group: admins
           
 - name: Deploy nodejs app
+  vars_files:
+    - vars
   hosts: "{{host}}"
   become: True
   become_user: "{{user_name}}"
@@ -33,7 +39,7 @@
         path: /home/{{user_name}}/package
     - name: Start the app
       command: 
-        chdir: /home/{{user_name}}/package/app
+        chdir: "{{user_home_dir}}"/package/app
         cmd: node server
        async: 1000
        poll: 0
