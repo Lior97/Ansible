@@ -1,49 +1,57 @@
----
 - name: install node and npm
   vars_files:
     - vars
-  hosts: "{{host}}"
-  tasks: 
+  hosts: "{{ host }}"
+  tasks:
     - name: Update apt repo and cache
-      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
     - name: Install nodejs and npm
-      apt: 
-        pkg: 
+      apt:
+        pkg:
           - nodejs
-          - npm          
+          - npm
 
 - name: Create a new user
   vars_files:
     - vars
-  hosts: "{{host}}"
+  hosts: "{{ host }}"
   tasks:
-    - name: Create linux user
+    - name: Create Linux user
       user:
-       name: "{{user_name}}"
-       comment: "{{user_name}}" Admin
-       group: admins
-          
+        name: "{{ user_name }}"
+        comment: "{{ user_name }} Admin"
+        group: admins
+
 - name: Deploy nodejs app
   vars_files:
     - vars
-  hosts: "{{host}}"
-  become: True
-  become_user: "{{user_name}}"
-  tasks: 
+  hosts: "{{ host }}"
+  become: true
+  become_user: "{{ user_name }}"
+  tasks:
     - name: Unpack nodejs file
-      unarchive: 
-        src: "{{location}}"-{{version}}.trz
-        des: "{{user_home_dir}}"
-    -name: Install dependencies
+      unarchive:
+        src: "{{ location }}-{{ version }}.trz"
+        dest: "{{ user_home_dir }}"
+
+    - name: Install dependencies
       npm:
-        path: "{{user_home_dir}}"/package
+        path: "{{ user_home_dir }}/package"
+
     - name: Start the app
-      command: 
-        chdir: "{{user_home_dir}}"/package/app
+      command:
         cmd: node server
-       async: 1000
-       poll: 0
+        chdir: "{{ user_home_dir }}/package/app"
+      async: 1000
+      poll: 0
+
     - name: Ensure app is running
       shell: ps aux | grep node
       register: app_status
-    - debug: msg={{app_status.stdout_lines}}
+
+    - debug:
+        msg: "{{ app_status.stdout_lines }}"
