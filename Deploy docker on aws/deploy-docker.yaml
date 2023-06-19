@@ -1,0 +1,68 @@
+---
+- name: Install python3, docker and docker-compose
+  hosts: docker_server
+  become: yes
+  gather_facts: False # Avoiding error message by the interpreter for a new server using python3 instead of 2.
+  tasks:
+    - name: Install python3, docker
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name:
+          - python3
+          - docker
+        update_cache: yes
+        state: present
+    - name: Install docker-compose
+      get_url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{ ansible_architecture }}"
+      dest: /usr/local/bin/docker-compose
+      mode: +x
+    - name: Install docker python module
+      pip:
+        name: docker
+
+    - name: Start docker
+      host: docker_server
+      become: yes
+      tasks:
+        - name: Start docker daemon
+          systemd:
+            name: docker
+            state: started
+        - name: Install docker and docker-compose python module
+          pip:
+            name:
+              - docker
+              - docker-compose
+
+
+- name: Add ec2-user to docker group
+  host: docker_server
+  become: yes
+  tasks:
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnect to server
+      meta: reset_connection
+
+- name: Start docker container
+  hosts: docker_server
+  vars_prompt: # You can use vars file to set up your password but it less secure.
+    - name: docker_password
+      prompt: Enter password for docker registry
+  tasks:
+    - name: Copy docker-compose
+      copy:
+        src: "{{ file_location }}"
+        dest: "{{ home_destination }}"
+    - name: Docker login
+      registry_url: https://index.docker.io/v1
+      username: liory97
+      password: "{{ docker_password }}"
+    - name: Start containers from docker-compose
+      docker-compose:
+        project_source: "{{ home_destination }}"
+        state: present
