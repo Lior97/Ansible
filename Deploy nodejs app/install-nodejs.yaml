@@ -16,7 +16,7 @@
 - name: Create a new user
   vars_files:
     - vars
-  hosts: "{{ host }}"
+  hosts: my_server
   tasks:
     - name: Create Linux user
       user:
@@ -27,7 +27,7 @@
 - name: Deploy nodejs app
   vars_files:
     - vars
-  hosts: "{{ host }}"
+  hosts: my_server
   become: true
   become_user: "{{ user_name }}"
   tasks:
