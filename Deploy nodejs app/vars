@@ -1,5 +1,4 @@
 version: 1.0.0
 location: /home/lior/Downloads/Bootcamp/nodejsapp/nodejs-app
-host: 159.89.1.54
 user_name: lior
 user_home_dir: /home/{{user_name}}
