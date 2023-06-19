@@ -1,7 +1,5 @@
 - name: install node and npm
-  vars_files:
-    - vars
-  hosts: "{{ host }}"
+  hosts: my_server
   tasks:
     - name: Update apt repo and cache
       apt:
