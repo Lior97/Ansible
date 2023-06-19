@@ -1,3 +1,19 @@
+---
+- name: Wait for ssh connection
+  host: docker_server
+  gather_facts: False
+  tasks:
+    - name: Ensure ssh port open
+      wair_for: 
+        port: 22
+        delay: 10
+        timeout: 100
+        search_regex: OpenSSH
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+       vars: 
+        ansible_connection: local
+        ansible_python_interpreter: /usr/bin/python
+ 
 - name: Install python3, docker and docker-compose
   hosts: docker_server
   become: yes
