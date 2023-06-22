@@ -46,7 +46,7 @@
       when: target_os == 'Amazon'
       become: true
       ansible.builtin.get_url:
-          url: https://github.com/docker/compose/releases/download/2.18.0/docker-compose-Linux-{{ ansible_architecture }}
+          url: https://github.com/docker/compose/releases/download/2.18.1/docker-compose-Linux-{{ ansible_architecture }}
           dest: /bin/docker-compose
           mode: +x
     
@@ -71,7 +71,6 @@
       ansible.builtin.user:
         name: "{{ linux_user }}"
         groups: adm, docker
-      become_user: root
 
     - name: start docker daemon
       become: true
@@ -136,7 +135,7 @@
       - "apt-get install gettext-base -y"
       become: true
 
-    - name: get initiladminpassword
+    - name: get password for jenkins web
       ignore_errors: true
       shell: sudo docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
       register: jenkins_admin_password
