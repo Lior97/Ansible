@@ -1,4 +1,4 @@
-target_os: ''
+target_os: 'Amazon'
 linux_user: my_user
 ansible_python_interpreter: /usr/bin/python3
 file_location: /Users/lior/docker-project/docker-compose.yaml
