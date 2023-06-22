@@ -29,7 +29,7 @@
         update_cache: yes
         state: present
     - name: Install docker-compose
-      get_url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{ ansible_architecture }}"
+      get_url: "https://github.com/docker/compose/releases/download/2.18.1/docker-compose-Linux-{{ ansible_architecture }}"
       dest: /usr/local/bin/docker-compose
       mode: +x
     - name: Install docker python module
