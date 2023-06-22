@@ -32,6 +32,7 @@
 
     - name: update yum and install docker.io
       when: target_os == 'Amazon'
+      become: true
       vars:
           - ansible_python_interpreter: /usr/bin/python
       ansible.builtin.yum:
@@ -40,50 +41,47 @@
           - pip
          update_cache: yes
          state: present
-      become_user: root
-      become: true
 
     - name: install docker-compose
       when: target_os == 'Amazon'
+      become: true
       ansible.builtin.get_url:
-          url: https://github.com/docker/compose/releases/download/1.22.0/docker-compose-Linux-{{ ansible_architecture }}
+          url: https://github.com/docker/compose/releases/download/1.27.0/docker-compose-Linux-{{ ansible_architecture }}
           dest: /bin/docker-compose
           mode: +x
-      become_user: root
-      become: true
     
     - name: pip install docker
+      become: true
       ansible.builtin.pip:
         name: 
          - docker
          - ansible
         executable: pip3
-      become: true
     
     - name: create user
       when: target_os == 'Ubuntu'
-      ansible.builtin.user:
-        name: "{{linux_user}}"
-        groups: admin, docker
-      become_user: root
       become: true
+      ansible.builtin.user:
+        name: "{{ linux_user }}"
+        groups: admin, docker
 
     - name: create user amazon
       when: target_os == 'Amazon'
+      become: true
       ansible.builtin.user:
-        name: "{{linux_user}}"
+        name: "{{ linux_user }}"
         groups: adm, docker
       become_user: root
-      become: true
 
     - name: start docker daemon
+      become: true
       service:
          name: docker
          state: started
          enabled: true
-      become: true
 
     - name: start jenkins container with docker socket
+      become: true 
       docker_container:
         name: jenkins
         image: jenkins/jenkins:lts
@@ -95,8 +93,6 @@
         ports:
                 - "8080:8080"
                 - "50000:5000"
-      become_user: root
-      become: true 
 
     - name: wait for jenkins container
       ansible.builtin.wait_for:
@@ -109,8 +105,8 @@
     - name: install TF in jenkins container
       community.docker.docker_container_exec:
         container: jenkins
-        command: /bin/bash -c "{{item}}"
-        user: root
+        command: /bin/bash -c "{{ item }}"
+        become: true
       with_items:
       - "curl -o /home/terraform.zip https://releases.hashicorp.com/terraform/1.3.7/terraform_1.3.7_linux_amd64.zip"
       - "unzip -o /home/terraform.zip"
@@ -133,7 +129,7 @@
     - name: install gettext for envsubst in jenkins container
       community.docker.docker_container_exec:
         container: jenkins
-        command: /bin/bash -c "{{item}}"
+        command: /bin/bash -c "{{ item }}"
         user: root
       with_items:
       - "apt-get update"
